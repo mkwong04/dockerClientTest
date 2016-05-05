@@ -10,7 +10,6 @@ import service.MaintenanceService;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.core.DockerClientBuilder;
 
 @Slf4j
@@ -33,17 +32,13 @@ public class MaintenanceServiceDockerImpl implements MaintenanceService {
 			log.info("creating container from image : {}",appImageName);
 			
 			CreateContainerResponse container = dockerClient.createContainerCmd(appImageName)
+															.withHostName(userName)
 														    .withCmd("/home/usr/ribbitup/start")
 														    .withName(userName)
 														    .exec();
 			
-			log.info("finding the virtual IP of container");
-			InspectContainerResponse inspectResult = dockerClient.inspectContainerCmd(container.getId()).exec();
 			
-			String containerVirtualIpAddress = inspectResult.getNetworkSettings().getIpAddress();
-			log.info("virtual IP of container : {}",containerVirtualIpAddress);
-			
-			userAppUrl = String.format("http://$s:9001", containerVirtualIpAddress);
+			userAppUrl = String.format("http://%s:9001", userName);
 			
 			log.info("redirect target url :{}",userAppUrl);
 			dockerClient.startContainerCmd(container.getId()).exec();
