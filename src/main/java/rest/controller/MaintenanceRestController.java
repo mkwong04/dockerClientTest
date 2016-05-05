@@ -32,7 +32,7 @@ public class MaintenanceRestController {
 		
 		
 		//TODO: lookup app's image name 
-		String appImageName = "ribbituptest/ribbitup";
+		String appImageName = "ribbituptest/ribbitupui";
 		String userAppUrl = maintenanceService.createApp(request.getUserName(),appImageName);
 		
 		RegisterResponse response = RegisterResponse.builder().url(userAppUrl).build();
