@@ -10,7 +10,7 @@ import service.MaintenanceService;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.Link;
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.core.DockerClientBuilder;
 
 @Slf4j
@@ -38,10 +38,16 @@ public class MaintenanceServiceDockerImpl implements MaintenanceService {
 														    .withName(userName)
 														    .exec();
 			
-			userAppUrl = String.format("http://%s:9001", userName);
+			log.info("starting container : {}",container.getId());
+			dockerClient.startContainerCmd(container.getId()).exec();
+			
+			log.info("inspecting container");
+			InspectContainerResponse inspectResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
+			
+			userAppUrl = String.format("http://%s:9001", inspectResponse.getNetworkSettings().getIpAddress());
 			
 			log.info("redirect target url :{}",userAppUrl);
-			dockerClient.startContainerCmd(container.getId()).exec();
+			
 		}
 		catch(IOException e){
 			log.error("Failed create docker client",e);
