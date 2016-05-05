@@ -16,7 +16,7 @@ import com.github.dockerjava.core.DockerClientBuilder;
 @Slf4j
 public class MaintenanceServiceDockerImpl implements MaintenanceService {
 	
-	@Value("docker.url")
+	@Value("${docker.url}")
 	private String dockerUrl;
 	
 	/**
@@ -25,6 +25,8 @@ public class MaintenanceServiceDockerImpl implements MaintenanceService {
 	@Override
 	public String createApp(String userName, String appImageName){
 		String userAppUrl = null;
+		
+		log.info("dockerUrl : {}",dockerUrl);
 		
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(dockerUrl).build();){
 		
