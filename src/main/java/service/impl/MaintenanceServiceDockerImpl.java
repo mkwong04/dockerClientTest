@@ -33,7 +33,7 @@ public class MaintenanceServiceDockerImpl implements MaintenanceService {
 			log.info("creating container from image : {}",appImageName);
 			
 			CreateContainerResponse container = dockerClient.createContainerCmd(appImageName)
-														    .withCmd("/home/usr/ribbitup/SandstormPlaySampleTest/start")
+														    .withCmd("/home/usr/ribbitup/start")
 														    .withName(userName)
 														    .exec();
 			
