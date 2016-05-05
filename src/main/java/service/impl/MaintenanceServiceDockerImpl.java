@@ -10,6 +10,7 @@ import service.MaintenanceService;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.model.Link;
 import com.github.dockerjava.core.DockerClientBuilder;
 
 @Slf4j
@@ -35,8 +36,8 @@ public class MaintenanceServiceDockerImpl implements MaintenanceService {
 															.withHostName(userName)
 														    .withCmd("/home/usr/ribbitup/start")
 														    .withName(userName)
+														    .withLinks(new Link(userName,userName))
 														    .exec();
-			
 			
 			userAppUrl = String.format("http://%s:9001", userName);
 			
