@@ -36,7 +36,6 @@ public class MaintenanceServiceDockerImpl implements MaintenanceService {
 															.withHostName(userName)
 														    .withCmd("/home/usr/ribbitup/start")
 														    .withName(userName)
-														    .withLinks(new Link(userName,userName))
 														    .exec();
 			
 			userAppUrl = String.format("http://%s:9001", userName);
