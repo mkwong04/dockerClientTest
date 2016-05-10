@@ -38,7 +38,7 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 			}
 		}
 		
-		File dataFile = new File(fileDir+File.pathSeparator+userAppDataFile);
+		File dataFile = new File(fileDir+File.separator+userAppDataFile);
 		
 		try(FileWriter fw = new FileWriter(dataFile, true);){
 			fw.write(String.format("%s,%s,%s,%s,%s\n", 
