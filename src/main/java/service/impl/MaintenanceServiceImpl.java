@@ -16,6 +16,7 @@ import service.DockerService;
 import service.MaintenanceService;
 import service.UserAppService;
 import service.exception.ApacheConfGenServiceException;
+import service.exception.DockerServiceException;
 import service.exception.MaintenanceServiceException;
 import service.exception.UserAppServiceException;
 import service.model.UserApp;
@@ -45,6 +46,8 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 	@Value("${apache.container.conf.path}")
 	private String apacheContainerConfPath;
 	
+	@Value("${apache.container.default.conf.name}")
+	private String apacheContainerDefaultConfName;
 	
 	@Autowired
 	private DockerService dockerService;
@@ -109,6 +112,29 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 							   apacheContainerName, 
 							   apacheContainerConfPath);
 		
+		try {
+			dockerService.execCmd(apacheContainerName, "tar -xf "+apacheContainerName+File.separator+apacheConfFile);
+			
+			//backup
+			dockerService.execCmd(apacheContainerName, 
+								  "cp "+apacheContainerName+File.separator+apacheContainerConfPath+" "
+									   +apacheContainerName+File.separator+apacheContainerConfPath+".bak");
+			
+			//replace
+			dockerService.execCmd(apacheContainerName, 
+								  "cp "+apacheContainerName+File.separator+apacheConfFile+" "
+									   +apacheContainerName+File.separator+apacheContainerConfPath);
+			
+			//reload apache conf
+			dockerService.execCmd(apacheContainerName, 
+								  "service apache2 reload");
+
+
+		} 
+		catch (DockerServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return String.format("%s/%s", domainUrl, userApp.getContainerName());
 	}
 	

@@ -11,3 +11,4 @@ apache.conf.name: out.conf
 maintenance.container.name: nostalgic_poitras
 apache.container.name: apache2
 apache.container.conf.path: /etc/apache2/sites-available
+apache.container.default.conf.name: 000-default.conf

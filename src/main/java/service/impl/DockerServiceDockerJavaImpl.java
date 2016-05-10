@@ -13,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import service.DockerService;
+import service.exception.DockerServiceException;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.NetworkSettings.Network;
 import com.github.dockerjava.core.DockerClientBuilder;
@@ -94,6 +96,20 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 		}
 	}
 	
+	@Override
+	public String execCmd(String containerName, String cmd) throws DockerServiceException{
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			ExecCreateCmdResponse response = dockerClient.execCreateCmd(containerName)
+														 .withCmd(cmd)
+														 .exec();
+			
+			return response.getId();
+		}
+		catch(IOException e){
+			throw new DockerServiceException(e);
+		}
+	}
+	
 	
 	private DockerClientConfig createConfig(){
 		return DockerClientConfig.createDefaultConfigBuilder()
@@ -102,5 +118,6 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 								  .withApiVersion("1.21")
 								  .build();
 	}
+
 	
 }

@@ -1,5 +1,7 @@
 package service;
 
+import service.exception.DockerServiceException;
+
 public interface DockerService{
 	
 	/**
@@ -26,4 +28,12 @@ public interface DockerService{
 				  String sourcePath,
 				  String targetContainerName,
 				  String targetPath);
+	
+	/**
+	 * 
+	 * @param containerName
+	 * @param cmd
+	 * @throws DockerServiceException
+	 */
+	String execCmd(String containerName, String cmd) throws DockerServiceException;
 }
