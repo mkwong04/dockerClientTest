@@ -61,7 +61,7 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 	public List<UserApp> findAll() {
 		List<UserApp> results = new ArrayList<>();
 		
-		File dataFile = new File(fileDir+File.pathSeparator+userAppDataFile);
+		File dataFile = new File(fileDir+File.separator+userAppDataFile);
 		
 		try(FileReader fr = new FileReader(dataFile);
 			BufferedReader br = new BufferedReader(fr)){
