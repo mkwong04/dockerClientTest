@@ -1,5 +1,6 @@
 package service.impl;
 
+import java.io.File;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -28,6 +29,22 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 	
 	@Value("${domain.url}")
 	private String domainUrl;
+	
+	@Value("${maintenance.container.name}")
+	private String maintenanceContainerName;
+	
+	@Value("${apache.container.name}")
+	private String apacheContainerName;
+	
+	@Value("${file.dir}")
+	private String maintenanceFileDir;
+	
+	@Value("${apache.conf.name}")
+	private String apacheConfFile;
+	
+	@Value("${apache.container.conf.path}")
+	private String apacheContainerConfPath;
+	
 	
 	@Autowired
 	private DockerService dockerService;
@@ -87,6 +104,11 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		}
 		
 		//4. copy to apache2 container to override and reload conf
+		dockerService.copyFile(maintenanceContainerName, 
+							   maintenanceFileDir+File.separator+apacheConfFile, 
+							   apacheContainerName, 
+							   apacheContainerConfPath);
+		
 		return String.format("%s/%s", domainUrl, userApp.getContainerName());
 	}
 	
