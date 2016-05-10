@@ -11,6 +11,7 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.NetworkSettings.Network;
 import com.github.dockerjava.core.DockerClientBuilder;
+import com.github.dockerjava.core.DockerClientConfig;
 
 import service.DockerService;
 
@@ -29,7 +30,13 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 		
 		log.info("dockerUrl : {}",dockerUrl);
 		
-		try(DockerClient dockerClient = DockerClientBuilder.getInstance(dockerUrl).build();){
+		DockerClientConfig config = DockerClientConfig.createDefaultConfigBuilder()
+													  .withDockerHost(dockerUrl)
+													  .withDockerTlsVerify(false)
+													  .withApiVersion("1.21")
+													  .build();
+		
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(config).build();){
 		
 			log.info("creating container from image : {}",appImageName);
 			
