@@ -27,8 +27,8 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	@Value("${docker.url}")
 	private String dockerUrl;
 	
-	@Value("${coreos.dir}")
-	private String coreOSDir;
+	@Value("${file.dir}")
+	private String fileDir;
 	
 	@Value("${apache.conf.name}")
 	private String apacheConfFile;
@@ -80,13 +80,13 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();
 			BufferedInputStream bis = new BufferedInputStream(dockerClient.copyArchiveFromContainerCmd(sourceContainerName, sourcePath).exec());){
 			
-			Path outputPath = Paths.get(coreOSDir+File.separator+apacheConfFile);
+			Path outputPath = Paths.get(fileDir+File.separator+apacheConfFile);
 			//write to host system 
 			Files.copy(bis, outputPath, StandardCopyOption.REPLACE_EXISTING);			
 			
 			dockerClient.copyArchiveToContainerCmd(targetContainerName)
 						.withRemotePath(targetPath)
-						.withHostResource(coreOSDir+File.separator+apacheConfFile)
+						.withHostResource(fileDir+File.separator+apacheConfFile)
 						.exec();
 		}
 		catch(IOException e){
