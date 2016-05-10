@@ -31,7 +31,7 @@
 			<dependency>
 				<groupId>com.github.docker-java</groupId>
 				<artifactId>docker-java</artifactId>
-				<version>2.2.3</version> <!-- Docker API v1.19, Docker Server 1.7x -->
+				<version>3.0.0-RC5</version> <!-- Docker API v1.21, Docker Server 1.91 -->
 			</dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->

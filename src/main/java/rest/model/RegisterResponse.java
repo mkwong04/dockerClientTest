@@ -13,5 +13,8 @@ public class RegisterResponse {
 	private String status;
 	
 	@JsonProperty
+	private String errorMsg;
+	
+	@JsonProperty
 	private String url;
 }

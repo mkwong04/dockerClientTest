@@ -9,5 +9,7 @@ public class RegisterRequest {
 	
 	@JsonProperty
 	private String userName;
-
+	
+	@JsonProperty
+	private String appName;
 }

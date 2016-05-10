@@ -30,13 +30,21 @@ public class MaintenanceRestController {
 	public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request){
 		log.info("register user");
 		
+		try{		
+			String userAppUrl = maintenanceService.createApp(request.getUserName(),request.getAppName());
 		
-		//TODO: lookup app's image name 
-		String appImageName = "ribbituptest/ribbitupui";
-		String userAppUrl = maintenanceService.createApp(request.getUserName(),appImageName);
-		
-		RegisterResponse response = RegisterResponse.builder().url(userAppUrl).build();
-		
-		return new ResponseEntity<RegisterResponse>(response, HttpStatus.OK);
+			return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
+																		.status("Success")
+																		.url(userAppUrl)
+																		.build(), 
+														HttpStatus.OK);
+		}
+		catch(Exception e){
+			return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
+																		.status("Error")
+																		.errorMsg(e.getMessage())
+																		.build(), 
+																		HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
