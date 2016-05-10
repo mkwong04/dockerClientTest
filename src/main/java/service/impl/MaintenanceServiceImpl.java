@@ -4,6 +4,8 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,7 @@ import service.exception.MaintenanceServiceException;
 import service.exception.UserAppServiceException;
 import service.model.UserApp;
 
+@Slf4j
 public class MaintenanceServiceImpl implements MaintenanceService{
 	
 	@Resource
@@ -49,6 +52,8 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			throw new MaintenanceServiceException("no images found for "+appName);
 		}
 		
+		
+		log.info("creating docker container");
 		//1. docker remote API to create new container by image
 		String routeUrl = dockerService.createApp(containerName, 
 												  appImageName, 
@@ -64,6 +69,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 								 .build();
 		
 		//2. create entry in persistence layer
+		log.info("Saving record to persistence layer");
 		try {
 			userApp = userAppService.create(userApp);
 		} 
@@ -72,6 +78,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		}
 		
 		//3. generate the apache2 conf
+		log.info("generate apache2 conf");
 		try {
 			apacheConfGenService.genConfig();
 		} 
@@ -80,7 +87,6 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		}
 		
 		//4. copy to apache2 container to override and reload conf
-		
 		return String.format("%s/%s", domainUrl, userApp.getContainerName());
 	}
 	

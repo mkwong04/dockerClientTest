@@ -34,15 +34,15 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 			 							  "</VirtualHost>";
 	
 	
-	public static final String PATTERN_1 = "ProxyPass /%s/ %s/";
-	public static final String PATTERN_2 = "ProxyHTMLURLMap %s /%s";
+	public static final String PATTERN_1 = "    ProxyPass /%s/ %s/\n";
+	public static final String PATTERN_2 = "    ProxyHTMLURLMap %s /%s\n";
 	
-	public static final String PATTERN_3 = "<Location /%s/>\n"+
-											"    ProxyPassReverse /\n"+
-											"    ProxyHTMLEnable On\n"+
-											"    ProxyHTMLURLMap / /%s/\n"+
-											"    RequestHeader unset Accept-Encoding\n"+
-											"</Location>";
+	public static final String PATTERN_3 = "    <Location /%s/>\n"+
+										   "        ProxyPassReverse /\n"+
+										   "        ProxyHTMLEnable On\n"+
+										   "        ProxyHTMLURLMap / /%s/\n"+
+										   "        RequestHeader unset Accept-Encoding\n"+
+										   "    </Location>";
 
 
 	@Autowired
