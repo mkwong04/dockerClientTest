@@ -40,6 +40,7 @@ public class MaintenanceRestController {
 														HttpStatus.OK);
 		}
 		catch(Exception e){
+			log.error("Failed createApp",e);
 			return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
 																		.status("Error")
 																		.errorMsg(e.getMessage())
