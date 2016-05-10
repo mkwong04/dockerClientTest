@@ -51,12 +51,10 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 			fw.flush();
 		}
 		catch(IOException e){
-			
+			log.error("error writing",e);
 		}
 		
-		
-		// TODO Auto-generated method stub
-		return null;
+		return userApp;
 	}
 
 	@Override
