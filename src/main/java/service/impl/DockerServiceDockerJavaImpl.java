@@ -101,6 +101,7 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
 			ExecCreateCmdResponse response = dockerClient.execCreateCmd(containerName)
 														 .withCmd(cmd)
+														 .withAttachStderr(true)
 														 .exec();
 			
 			return response.getId();
