@@ -15,7 +15,8 @@ public interface DockerService{
 	String createApp(String containerName, 
 					 String appImageName,
 					 String containerListenUrlPattern,
-					 String... startCmd);
+					 String... startCmd)
+		throws DockerServiceException;
 	
 	/**
 	 * 

@@ -77,58 +77,41 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		}
 		
 		
-		log.info("creating docker container");
-		//1. docker remote API to create new container by image
-		String routeUrl = dockerService.createApp(containerName, 
-												  appImageName, 
-												  containerListenUrlPattern,
-												  construnctCmd("while true; do sleep 1;done"));
+		try
+		{
+			log.info("creating docker container");
+			//1. docker remote API to create new container by image
+			String routeUrl = dockerService.createApp(containerName, 
+													  appImageName, 
+													  containerListenUrlPattern,
+													  construnctCmd(startCmd));
 		
-		try {
-			dockerService.execCmd(containerName, construnctCmd(startCmd));
-		} 
-		catch (DockerServiceException e1) {
-			throw new MaintenanceServiceException("Failed starting container ["+containerName+"]",e1);
-		}
-		
-		UserApp userApp = UserApp.builder()
-								 .id("0")
-								 .userName(userName)
-								 .appName(appName)
-								 .containerName(containerName)
-								 .containerUrl(routeUrl)
-								 .build();
-		
-		//2. create entry in persistence layer
-		log.info("Saving record to persistence layer");
-		try {
+			UserApp userApp = UserApp.builder()
+					 .id("0")
+					 .userName(userName)
+					 .appName(appName)
+					 .containerName(containerName)
+					 .containerUrl(routeUrl)
+					 .build();
+
+			//2. create entry in persistence layer
+			log.info("Saving record to persistence layer");
 			userApp = userAppService.create(userApp);
-		} 
-		catch (UserAppServiceException e) {
-			throw new MaintenanceServiceException(e);
-		}
-		
-		//3. generate the apache2 conf
-		log.info("generate apache2 conf");
-		try {
+			
+			//3. generate the apache2 conf
+			log.info("generate apache2 conf");
 			apacheConfGenService.genConfig();
-		} 
-		catch (ApacheConfGenServiceException e) {
-			throw new MaintenanceServiceException(e);
-		}
-		
-		//4. copy to apache2 container to override and reload conf
-		dockerService.copyFile(maintenanceContainerName, 
-							   maintenanceFileDir+File.separator+apacheConfFile, 
-							   apacheContainerName, 
-							   apacheContainerConfPath);
-		
-		try {
+			
+			//4. copy to apache2 container to override and reload conf
+			dockerService.copyFile(maintenanceContainerName, 
+								   maintenanceFileDir+File.separator+apacheConfFile, 
+								   apacheContainerName, 
+								   apacheContainerConfPath);
 			
 			dockerService.execCmd(apacheContainerName, 
-								  BASH_CMD, 
-								  "-c", 
-								  "tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile);
+					  BASH_CMD, 
+					  "-c", 
+					  "tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile);
 			log.info("tar extracted");
 			
 			
@@ -153,13 +136,18 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 								  "-c",
 								  "service apache2 reload");
 			log.info("reload config");
+			
+			return String.format("%s/%s", domainUrl, userApp.getContainerName());
 
-		} 
-		catch (DockerServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
-		return String.format("%s/%s", domainUrl, userApp.getContainerName());
+		catch (DockerServiceException e1) {
+			throw new MaintenanceServiceException("Failed starting container ["+containerName+"]",e1);
+		}
+		catch (UserAppServiceException | ApacheConfGenServiceException e) {
+			throw new MaintenanceServiceException(e);
+		}
+
 	}
 	
 	private String[] construnctCmd(String cmd){

@@ -41,7 +41,8 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	public String createApp(String containerName, 
 							String appImageName, 
 							String containerListenUrlPattern,
-							String... startCmd) {
+							String... startCmd) 
+		throws DockerServiceException{
 		String userAppUrl = null;
 		
 		log.info("dockerUrl : {}",dockerUrl);
@@ -51,12 +52,14 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			log.info("creating container from image : {}",appImageName);
 			
 			CreateContainerResponse container = dockerClient.createContainerCmd(appImageName)
-														    .withCmd(startCmd)
+//														    .withCmd(startCmd)
 														    .withName(containerName)
 														    .exec();
 			
 			log.info("starting container : {}",container.getId());
 			dockerClient.startContainerCmd(container.getId()).exec();
+			
+			execCmd(containerName, startCmd);
 			
 			log.info("inspecting container");
 			InspectContainerResponse inspectResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
