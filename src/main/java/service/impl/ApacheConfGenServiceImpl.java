@@ -31,7 +31,7 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 			 							  "    ProxyRequests Off\n\n%s\n"+
 			 							  "    ErrorLog ${APACHE_LOG_DIR}/error.log\n"+
 			 							  "    CustomLog ${APACHE_LOG_DIR}/access.log combined\n"+
-			 							  "</VirtualHost>";
+			 							  "</VirtualHost>\n\n";
 	
 	
 	public static final String PATTERN_1 = "    ProxyPass /%s/ %s/\n";
