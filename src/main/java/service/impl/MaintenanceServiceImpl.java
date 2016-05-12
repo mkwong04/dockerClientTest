@@ -109,7 +109,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 								   apacheContainerConfPath);
 			
 			dockerService.execCmd(apacheContainerName, 
-								  construnctCmd("tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile));
+								  construnctCmd("\"tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile+"\""));
 			log.info("tar extracted");
 			
 			
