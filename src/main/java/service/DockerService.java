@@ -35,5 +35,5 @@ public interface DockerService{
 	 * @param cmd
 	 * @throws DockerServiceException
 	 */
-	String execCmd(String containerName, String cmd) throws DockerServiceException;
+	void execCmd(String containerName, String... cmd) throws DockerServiceException;
 }

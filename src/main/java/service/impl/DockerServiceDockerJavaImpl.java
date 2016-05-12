@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +23,7 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.NetworkSettings.Network;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.command.ExecStartResultCallback;
 
 @Slf4j
 public class DockerServiceDockerJavaImpl implements DockerService{
@@ -97,16 +99,26 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	}
 	
 	@Override
-	public String execCmd(String containerName, String cmd) throws DockerServiceException{
+	public void execCmd(String containerName, String... cmd) throws DockerServiceException{
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
 			ExecCreateCmdResponse response = dockerClient.execCreateCmd(containerName)
 														 .withCmd(cmd)
+														 .withAttachStdin(false)
+														 .withAttachStdout(true)
 														 .withAttachStderr(true)
 														 .exec();
 			
-			return response.getId();
+			log.info("exec id :{}",response.getId());
+			
+			if(!dockerClient.execStartCmd(response.getId())
+						 .withDetach(false)
+						 .withTty(false)
+						 .exec(new ExecStartResultCallback())
+						 .awaitCompletion(1, TimeUnit.MINUTES)){
+				throw new DockerServiceException("time out while execute command "+cmd);
+			}
 		}
-		catch(IOException e){
+		catch(IOException | InterruptedException e){
 			throw new DockerServiceException(e);
 		}
 	}

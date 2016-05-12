@@ -113,26 +113,35 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 							   apacheContainerConfPath);
 		
 		try {
-			String id;
 			
-			id = dockerService.execCmd(apacheContainerName, 
-									   "tar -xf "+apacheContainerName+File.separator+apacheConfFile);
-			log.info("tar extract :{}",id);
+			dockerService.execCmd(apacheContainerName, 
+								  "/bin/bash", 
+								  "-c", 
+								  "tar -xf "+apacheContainerName+File.separator+apacheConfFile);
+			log.info("tar extracted");
+			
 			
 			//backup
-			dockerService.execCmd(apacheContainerName, 
-								  	"cp "+apacheContainerName+File.separator+apacheContainerConfPath+" "
+			dockerService.execCmd(apacheContainerName,
+								  "/bin/bash", 
+								  "-c", 
+								   "cp "+apacheContainerName+File.separator+apacheContainerConfPath+" "
 									   +apacheContainerName+File.separator+apacheContainerConfPath+".bak");
-			log.info("backup : {}",id);
+			log.info("backup existing config");
 			//replace
 			dockerService.execCmd(apacheContainerName, 
+								  "/bin/bash", 
+								  "-c", 
 								  "cp "+apacheContainerName+File.separator+apacheConfFile+" "
 									   +apacheContainerName+File.separator+apacheContainerConfPath);
 			
+			log.info("replace config");
 			//reload apache conf
-			dockerService.execCmd(apacheContainerName, 
+			dockerService.execCmd(apacheContainerName,
+								  "/bin/bash", 
+								  "-c",
 								  "service apache2 reload");
-
+			log.info("reload config");
 
 		} 
 		catch (DockerServiceException e) {
