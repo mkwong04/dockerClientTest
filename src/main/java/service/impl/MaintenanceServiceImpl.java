@@ -133,7 +133,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 								  construnctCmd("service apache2 reload"));
 			log.info("reload config");
 			
-			return String.format("%s/%s", domainUrl, userApp.getContainerName());
+			return String.format("%s/%s/", domainUrl, userApp.getContainerName());
 
 			
 		}

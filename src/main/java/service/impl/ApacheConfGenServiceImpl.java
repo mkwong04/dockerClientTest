@@ -69,7 +69,7 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 			
 			File dataFile = new File(fileDir+File.separator+apacheConfFile);
 			
-			try(FileWriter fw = new FileWriter(dataFile, true);){
+			try(FileWriter fw = new FileWriter(dataFile, false);){
 				fw.write(finalConfigStr);
 				
 				fw.flush();
