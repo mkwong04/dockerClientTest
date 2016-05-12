@@ -8,14 +8,14 @@ public interface DockerService{
 	 * 
 	 * @param containerName
 	 * @param appImageName
-	 * @param startCmd
 	 * @param containerListenUrlPattern
+	 * @param startCmd
 	 * @return
 	 */
 	String createApp(String containerName, 
-					 String appImageName, 
-					 String startCmd,
-					 String containerListenUrlPattern);
+					 String appImageName,
+					 String containerListenUrlPattern,
+					 String... startCmd);
 	
 	/**
 	 * 

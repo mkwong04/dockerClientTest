@@ -24,6 +24,9 @@ import service.model.UserApp;
 @Slf4j
 public class MaintenanceServiceImpl implements MaintenanceService{
 	
+	static final String BASH_CMD = "/bin/bash";
+	static final String BASH_STRING_OPT = "-c";
+	
 	@Resource
 	@Qualifier("appImagesProperties")
 	private Properties appImagesProperties;
@@ -65,7 +68,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		
 		//TODO:
 		String appImageName = appImagesProperties.getProperty(appName);
-		String defaultCmd = "/bin/bash";
+
 		String startCmd = "/home/usr/ribbitup/start";
 		String containerListenUrlPattern = "http://%s:9001";
 		
@@ -78,11 +81,11 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		//1. docker remote API to create new container by image
 		String routeUrl = dockerService.createApp(containerName, 
 												  appImageName, 
-												  defaultCmd,
-												  containerListenUrlPattern);
+												  containerListenUrlPattern,
+												  construnctCmd("while true; do sleep 1;done"));
 		
 		try {
-			dockerService.execCmd(containerName, defaultCmd, "-c", startCmd);
+			dockerService.execCmd(containerName, construnctCmd(startCmd));
 		} 
 		catch (DockerServiceException e1) {
 			throw new MaintenanceServiceException("Failed starting container ["+containerName+"]",e1);
@@ -123,7 +126,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		try {
 			
 			dockerService.execCmd(apacheContainerName, 
-								  "/bin/bash", 
+								  BASH_CMD, 
 								  "-c", 
 								  "tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile);
 			log.info("tar extracted");
@@ -131,14 +134,14 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			
 			//backup
 			dockerService.execCmd(apacheContainerName,
-								  "/bin/bash", 
+								  BASH_CMD, 
 								  "-c", 
 								   "cp "+apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+" "
 									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+".bak");
 			log.info("backup existing config");
 			//replace
 			dockerService.execCmd(apacheContainerName, 
-								  "/bin/bash", 
+								  BASH_CMD, 
 								  "-c", 
 								  "cp "+apacheContainerConfPath+File.separator+apacheConfFile+" "
 									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName);
@@ -146,7 +149,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			log.info("replace config");
 			//reload apache conf
 			dockerService.execCmd(apacheContainerName,
-								  "/bin/bash", 
+								  BASH_CMD, 
 								  "-c",
 								  "service apache2 reload");
 			log.info("reload config");
@@ -157,6 +160,11 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			e.printStackTrace();
 		}
 		return String.format("%s/%s", domainUrl, userApp.getContainerName());
+	}
+	
+	private String[] construnctCmd(String cmd){
+		
+		return new String[]{BASH_CMD, BASH_STRING_OPT, cmd};
 	}
 	
 }

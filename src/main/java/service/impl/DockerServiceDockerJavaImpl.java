@@ -40,8 +40,8 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	@Override
 	public String createApp(String containerName, 
 							String appImageName, 
-							String startCmd,
-							String containerListenUrlPattern) {
+							String containerListenUrlPattern,
+							String... startCmd) {
 		String userAppUrl = null;
 		
 		log.info("dockerUrl : {}",dockerUrl);
