@@ -65,6 +65,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		
 		//TODO:
 		String appImageName = appImagesProperties.getProperty(appName);
+		String defaultCmd = "/bin/bash";
 		String startCmd = "/home/usr/ribbitup/start";
 		String containerListenUrlPattern = "http://%s:9001";
 		
@@ -77,8 +78,15 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		//1. docker remote API to create new container by image
 		String routeUrl = dockerService.createApp(containerName, 
 												  appImageName, 
-												  startCmd,
+												  defaultCmd,
 												  containerListenUrlPattern);
+		
+		try {
+			dockerService.execCmd(containerName, defaultCmd, "-c", startCmd);
+		} 
+		catch (DockerServiceException e1) {
+			throw new MaintenanceServiceException("Failed starting container ["+containerName+"]",e1);
+		}
 		
 		UserApp userApp = UserApp.builder()
 								 .id("0")
