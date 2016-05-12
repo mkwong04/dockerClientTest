@@ -152,6 +152,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 	
 	private String[] construnctCmd(String cmd){
 		
+		log.info(BASH_CMD+" "+BASH_STRING_OPT+" {}", cmd);
 		return new String[]{BASH_CMD, BASH_STRING_OPT, cmd};
 	}
 	
