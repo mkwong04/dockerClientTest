@@ -109,32 +109,26 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 								   apacheContainerConfPath);
 			
 			dockerService.execCmd(apacheContainerName, 
-					  BASH_CMD, 
-					  "-c", 
-					  "tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile);
+								  construnctCmd("tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile));
 			log.info("tar extracted");
 			
 			
 			//backup
 			dockerService.execCmd(apacheContainerName,
-								  BASH_CMD, 
-								  "-c", 
+								  construnctCmd(
 								   "cp "+apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+" "
-									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+".bak");
+									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+".bak"));
 			log.info("backup existing config");
 			//replace
 			dockerService.execCmd(apacheContainerName, 
-								  BASH_CMD, 
-								  "-c", 
+								  construnctCmd(
 								  "cp "+apacheContainerConfPath+File.separator+apacheConfFile+" "
-									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName);
+									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName));
 			
 			log.info("replace config");
 			//reload apache conf
 			dockerService.execCmd(apacheContainerName,
-								  BASH_CMD, 
-								  "-c",
-								  "service apache2 reload");
+								  construnctCmd("service apache2 reload"));
 			log.info("reload config");
 			
 			return String.format("%s/%s", domainUrl, userApp.getContainerName());

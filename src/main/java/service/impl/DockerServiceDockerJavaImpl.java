@@ -52,7 +52,6 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			log.info("creating container from image : {}",appImageName);
 			
 			CreateContainerResponse container = dockerClient.createContainerCmd(appImageName)
-//														    .withCmd(startCmd)
 														    .withName(containerName)
 														    .withAttachStdin(true)
 														    .withTty(true)
@@ -115,15 +114,15 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			
 			log.info("exec id :{}",response.getId());
 			
-//			if(!dockerClient.execStartCmd(response.getId())
-//						 .withDetach(false)
-//						 .withTty(false)
-//						 .exec(new ExecStartResultCallback())
-//						 .awaitCompletion(1, TimeUnit.MINUTES)){
-//				throw new DockerServiceException("time out while execute command "+cmd);
-//			}
+			if(!dockerClient.execStartCmd(response.getId())
+						 .withDetach(false)
+						 .withTty(false)
+						 .exec(new ExecStartResultCallback())
+						 .awaitCompletion(1, TimeUnit.MINUTES)){
+				throw new DockerServiceException("time out while execute command "+cmd);
+			}
 		}
-		catch(IOException e){
+		catch(IOException | InterruptedException e){
 			throw new DockerServiceException(e);
 		}
 	}
