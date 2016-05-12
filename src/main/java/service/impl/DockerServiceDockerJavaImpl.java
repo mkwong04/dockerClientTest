@@ -60,7 +60,7 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			log.info("starting container : {}",container.getId());
 			dockerClient.startContainerCmd(container.getId()).exec();
 			
-			execCmd(containerName, startCmd);
+			execCmd(containerName, null, startCmd);
 			
 			log.info("inspecting container");
 			InspectContainerResponse inspectResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
@@ -104,6 +104,13 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	
 	@Override
 	public void execCmd(String containerName, String... cmd) throws DockerServiceException{
+		
+		execCmd(containerName, 1L, cmd);
+	}
+	
+	private void execCmd(String containerName, 
+						 Long timeoutMins, 
+						 String... cmd) throws DockerServiceException{
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
 			ExecCreateCmdResponse response = dockerClient.execCreateCmd(containerName)
 														 .withCmd(cmd)
@@ -114,13 +121,20 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			
 			log.info("exec id :{}",response.getId());
 			
-			if(!dockerClient.execStartCmd(response.getId())
-						 .withDetach(false)
-						 .withTty(false)
-						 .exec(new ExecStartResultCallback())
-						 .awaitCompletion(1, TimeUnit.MINUTES)){
-				throw new DockerServiceException("time out while execute command "+cmd);
+			ExecStartResultCallback callBack  = dockerClient.execStartCmd(response.getId())
+														    .withDetach(false)
+														    .withTty(false)
+														    .exec(new ExecStartResultCallback());
+			
+			if(timeoutMins!=null){
+				if(!callBack.awaitCompletion(1, TimeUnit.MINUTES)){
+					throw new DockerServiceException("time out while execute command "+cmd);
+				}
 			}
+			else{
+				callBack.awaitStarted();
+			}
+			
 		}
 		catch(IOException | InterruptedException e){
 			throw new DockerServiceException(e);
