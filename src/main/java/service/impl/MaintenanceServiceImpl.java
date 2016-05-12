@@ -117,7 +117,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			dockerService.execCmd(apacheContainerName, 
 								  "/bin/bash", 
 								  "-c", 
-								  "tar -xf "+apacheContainerName+File.separator+apacheConfFile);
+								  "tar -xf "+apacheContainerConfPath+File.separator+apacheConfFile);
 			log.info("tar extracted");
 			
 			
@@ -125,15 +125,15 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			dockerService.execCmd(apacheContainerName,
 								  "/bin/bash", 
 								  "-c", 
-								   "cp "+apacheContainerName+File.separator+apacheContainerConfPath+" "
-									   +apacheContainerName+File.separator+apacheContainerConfPath+".bak");
+								   "cp "+apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+" "
+									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+".bak");
 			log.info("backup existing config");
 			//replace
 			dockerService.execCmd(apacheContainerName, 
 								  "/bin/bash", 
 								  "-c", 
-								  "cp "+apacheContainerName+File.separator+apacheConfFile+" "
-									   +apacheContainerName+File.separator+apacheContainerConfPath);
+								  "cp "+apacheContainerConfPath+File.separator+apacheConfFile+" "
+									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName);
 			
 			log.info("replace config");
 			//reload apache conf
