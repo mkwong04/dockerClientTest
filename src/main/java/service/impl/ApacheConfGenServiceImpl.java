@@ -31,7 +31,7 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 			 							  "    ProxyRequests Off\n\n%s\n"+
 			 							  "    ErrorLog ${APACHE_LOG_DIR}/error.log\n"+
 			 							  "    CustomLog ${APACHE_LOG_DIR}/access.log combined\n"+
-			 							  "</VirtualHost>\n\n";
+			 							  "</VirtualHost>";
 	
 	
 	public static final String PATTERN_1 = "    ProxyPass /%s/ %s/\n";
@@ -42,7 +42,7 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 										   "        ProxyHTMLEnable On\n"+
 										   "        ProxyHTMLURLMap / /%s/\n"+
 										   "        RequestHeader unset Accept-Encoding\n"+
-										   "    </Location>";
+										   "    </Location>\n\n";
 
 
 	@Autowired
