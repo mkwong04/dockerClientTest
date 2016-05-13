@@ -39,10 +39,8 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	@Override
 	public String createApp(String containerName, 
 							String appImageName, 
-							String containerListenUrlPattern,
 							String... startCmd) 
 		throws DockerServiceException{
-		String userAppUrl = null;
 		
 		log.info("dockerUrl : {}",dockerUrl);
 		
@@ -54,7 +52,6 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 														    .withName(containerName)
 														    .withAttachStdin(true)
 														    .withTty(true)
-														    .withNetworkDisabled(true)
 														    .exec();
 			
 			log.info("starting container : {}",container.getId());
@@ -62,21 +59,11 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			
 			execCmd(containerName, null, startCmd);
 			
-//			log.info("inspecting container");
-//			InspectContainerResponse inspectResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
-//			
-//			Network network = inspectResponse.getNetworkSettings().getNetworks().get("bridge");
-			
-			userAppUrl = String.format(containerListenUrlPattern, containerName);
-			
-			log.info("redirect target url :{}",userAppUrl);
-			
+			return container.getId();
 		}
 		catch(IOException e){
-			log.error("Failed create docker client",e);
+			throw new DockerServiceException("failed create App",e);
 		}
-		
-		return userAppUrl;
 	}
 	
 	@Override

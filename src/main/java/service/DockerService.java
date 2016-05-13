@@ -8,13 +8,11 @@ public interface DockerService{
 	 * 
 	 * @param containerName
 	 * @param appImageName
-	 * @param containerListenUrlPattern
 	 * @param startCmd
 	 * @return
 	 */
 	String createApp(String containerName, 
 					 String appImageName,
-					 String containerListenUrlPattern,
 					 String... startCmd)
 		throws DockerServiceException;
 	

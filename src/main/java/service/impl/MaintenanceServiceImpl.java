@@ -81,11 +81,13 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		{
 			log.info("creating docker container");
 			//1. docker remote API to create new container by image
-			String routeUrl = dockerService.createApp(containerName, 
-													  appImageName, 
-													  containerListenUrlPattern,
-													  construnctCmd(startCmd));
+			String appContainerId = dockerService.createApp(containerName, 
+													  		appImageName,
+													  		construnctCmd(startCmd));
 		
+			String routeUrl = String.format(containerListenUrlPattern, containerName);
+			
+			log.info("redirect target url :{}",routeUrl);
 			//2. create user defined network bridge
 			log.info("Creating network bridge for {}",containerName);
 			String networkId = dockerService.createConnection(containerName, 
@@ -105,8 +107,8 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			userApp = userAppService.create(userApp);
 			
 			//4. connect network bridge to app container
-			log.info("Connecting network bridge {} to {} ", networkId, containerName);
-			dockerService.connectConnection(networkId, containerName);
+			log.info("Connecting network bridge {} to {} ", networkId, appContainerId);
+			dockerService.connectConnection(networkId, appContainerId);
 			
 			//5. connect network bridge to apache container
 			log.info("Connecting network bridge {} to {} ", networkId, apacheContainerName);
