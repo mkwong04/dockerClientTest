@@ -20,6 +20,28 @@ public interface DockerService{
 	
 	/**
 	 * 
+	 * @param networkName
+	 * @param driver
+	 * @return
+	 * @throws DockerServiceException
+	 */
+	String createConnection(String networkName, 
+			 				String driver)
+		throws DockerServiceException;
+	
+	/**
+	 * 
+	 * @param networkId
+	 * @param containerName
+	 * @return
+	 * @throws DockerServiceException
+	 */
+	void connectConnection(String networkId, 
+		                   String containerName)
+		throws DockerServiceException;
+	
+	/**
+	 * 
 	 * @param sourceContainerName
 	 * @param sourcePath
 	 * @param targetContainerName

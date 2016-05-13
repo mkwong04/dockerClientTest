@@ -86,23 +86,37 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 													  containerListenUrlPattern,
 													  construnctCmd(startCmd));
 		
+			//2. create user defined network bridge
+			log.info("Creating network bridge for {}",containerName);
+			String networkId = dockerService.createConnection(containerName, 
+															  "bridge");
+			
+			//3. create entry in persistence layer
 			UserApp userApp = UserApp.builder()
-					 .id("0")
-					 .userName(userName)
-					 .appName(appName)
-					 .containerName(containerName)
-					 .containerUrl(routeUrl)
-					 .build();
+					 				 .id("0")
+					 				 .userName(userName)
+					 				 .appName(appName)
+					 				 .containerName(containerName)
+					 				 .containerUrl(routeUrl)
+					 				 .networkId(networkId)
+					 				 .build();
 
-			//2. create entry in persistence layer
 			log.info("Saving record to persistence layer");
 			userApp = userAppService.create(userApp);
 			
-			//3. generate the apache2 conf
+			//4. connect network bridge to app container
+			log.info("Connecting network bridge {} to {} ", networkId, containerName);
+			dockerService.connectConnection(networkId, containerName);
+			
+			//5. connect network bridge to apache container
+			log.info("Connecting network bridge {} to {} ", networkId, apacheContainerName);
+			dockerService.connectConnection(networkId, apacheContainerName);
+			 
+			//6. generate the apache2 conf
 			log.info("generate apache2 conf");
 			apacheConfGenService.genConfig();
 			
-			//4. copy to apache2 container to override and reload conf
+			//7. copy to apache2 container to override and reload conf
 			dockerService.copyFile(maintenanceContainerName, 
 								   maintenanceFileDir+File.separator+apacheConfFile, 
 								   apacheContainerName, 
@@ -115,26 +129,25 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			log.info("tar extracted");
 			
 			
-			//backup
+			//8. backup
 			dockerService.execCmd(apacheContainerName,
 								  construnctCmd(
 								   "cp "+apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+" "
 									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName+".bak"));
 			log.info("backup existing config");
-			//replace
+			//9. replace
 			dockerService.execCmd(apacheContainerName, 
 								  construnctCmd(
 								  "cp "+apacheContainerConfPath+File.separator+apacheConfFile+".plain "
 									   +apacheContainerConfPath+File.separator+apacheContainerDefaultConfName));
 			
 			log.info("replace config");
-			//reload apache conf
+			//10. reload apache conf
 			dockerService.execCmd(apacheContainerName,
 								  construnctCmd("service apache2 reload"));
 			log.info("reload config");
 			
 			return String.format("%s/%s/", domainUrl, userApp.getContainerName());
-
 			
 		}
 		catch (DockerServiceException e1) {

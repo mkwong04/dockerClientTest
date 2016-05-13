@@ -18,9 +18,8 @@ import service.exception.DockerServiceException;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.CreateNetworkResponse;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
-import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.model.NetworkSettings.Network;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
@@ -55,6 +54,7 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 														    .withName(containerName)
 														    .withAttachStdin(true)
 														    .withTty(true)
+														    .withNetworkDisabled(true)
 														    .exec();
 			
 			log.info("starting container : {}",container.getId());
@@ -62,12 +62,12 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			
 			execCmd(containerName, null, startCmd);
 			
-			log.info("inspecting container");
-			InspectContainerResponse inspectResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
+//			log.info("inspecting container");
+//			InspectContainerResponse inspectResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
+//			
+//			Network network = inspectResponse.getNetworkSettings().getNetworks().get("bridge");
 			
-			Network network = inspectResponse.getNetworkSettings().getNetworks().get("bridge");
-			
-			userAppUrl = String.format(containerListenUrlPattern, network.getIpAddress());
+			userAppUrl = String.format(containerListenUrlPattern, containerName);
 			
 			log.info("redirect target url :{}",userAppUrl);
 			
@@ -77,6 +77,43 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 		}
 		
 		return userAppUrl;
+	}
+	
+	@Override
+	public String createConnection(String networkName, 
+								   String driver)
+		throws DockerServiceException{
+		
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			
+			CreateNetworkResponse response = dockerClient.createNetworkCmd()
+														 .withName(networkName)
+														 .withDriver(driver)
+														 .exec();
+			
+			log.info("network id :{}",response.getId());
+			
+			return response.getId();
+		} 
+		catch (IOException e) {
+			throw new DockerServiceException("create connection failed",e);
+		}
+	}
+	
+	@Override
+	public void connectConnection(String networkId, 
+								  String containerName)
+		throws DockerServiceException{
+		
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			dockerClient.connectToNetworkCmd()
+						.withNetworkId(networkId)
+						.withContainerId(containerName)
+						.exec();
+		}
+		catch (IOException e) {
+			throw new DockerServiceException("connection connection failed",e);
+		}
 	}
 
 	@Override
