@@ -17,7 +17,4 @@ public class UserApp{
 	
 	@JsonProperty
 	private String appName;
-	
-	@JsonProperty
-	private String containerUrl;
 }

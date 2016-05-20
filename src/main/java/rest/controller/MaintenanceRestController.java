@@ -70,7 +70,6 @@ public class MaintenanceRestController {
 										   .id(userApp.getId())
 										   .appName(userApp.getAppName())
 										   .userName(userApp.getUserName())
-										   .containerUrl(userApp.getContainerUrl())
 										   .build());
 			}
 
@@ -103,7 +102,6 @@ public class MaintenanceRestController {
 										   .id(userApp.getId())
 										   .appName(userApp.getAppName())
 										   .userName(userApp.getUserName())
-										   .containerUrl(userApp.getContainerUrl())
 										   .build());
 			}
 

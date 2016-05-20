@@ -11,6 +11,7 @@ public class UserApp{
 	private String userName;
 	private String appName;
 	
+	//used for internal apache reversed proxy route config generation
 	private String containerUrl;
 	private String containerName;
 	
