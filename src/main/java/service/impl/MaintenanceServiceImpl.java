@@ -1,6 +1,7 @@
 package service.impl;
 
 import java.io.File;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -166,5 +167,24 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		log.info(BASH_CMD+" "+BASH_STRING_OPT+" {}", cmd);
 		return new String[]{BASH_CMD, BASH_STRING_OPT, cmd};
 	}
-	
+
+	@Override
+	public List<UserApp> listAllUserApp() throws MaintenanceServiceException {
+		try{
+			return userAppService.findAll();
+		}
+		catch(UserAppServiceException e){
+			throw new MaintenanceServiceException(e);
+		}
+	}
+
+	@Override
+	public List<UserApp> findUserApp(String userName) throws MaintenanceServiceException {
+		try{
+			return userAppService.findByUserName(userName);
+		}
+		catch(UserAppServiceException e){
+			throw new MaintenanceServiceException(e);
+		}
+	}
 }

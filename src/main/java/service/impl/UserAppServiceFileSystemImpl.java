@@ -91,8 +91,35 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 
 	@Override
 	public List<UserApp> findByUserName(String userName) {
-		// TODO Auto-generated method stub
-		return null;
+		List<UserApp> results = new ArrayList<>();
+		
+		File dataFile = new File(fileDir+File.separator+userAppDataFile);
+		
+		try(FileReader fr = new FileReader(dataFile);
+			BufferedReader br = new BufferedReader(fr)){
+			
+			String record;
+			while((record = br.readLine())!=null){
+				String[] data = record.split(",");
+
+				if(data.length==5 && 
+				   data[1]!=null && data[1].equals(userName)){
+					results.add(UserApp.builder()
+									   .id(data[0])
+									   .userName(data[1])
+									   .appName(data[2])
+									   .containerName(data[3])
+									   .containerUrl(data[4])
+									   .build());
+				}
+			}
+			
+		}
+		catch(IOException e){
+			
+		}
+		
+		return results;
 	}
 	
 }
