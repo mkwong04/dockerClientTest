@@ -25,6 +25,12 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 	@Value("${apache.conf.name}")
 	private String apacheConfFile;
 	
+	@Value("${ribbitup.container.name}")
+	private String ribbitupContainerName;
+	
+	@Value("${ribbitup.container.url}")
+	private String ribbitupContainerUrl;
+	
 	public static final String TEMPLATE = "<VirtualHost *:80>\n"+
 			 							  "    ServerAdmin webmaster@localhost\n"+
 			 							  "    DocumentRoot /var/www/html\n"+
@@ -56,12 +62,18 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 			
 			StringBuilder sb = new StringBuilder();
 
+			//setup reversed proxy route for individual user app
 			for(UserApp userApp: userAppList){
 				
 				sb.append(String.format(PATTERN_1, userApp.getContainerName(),userApp.getContainerUrl()));
 				sb.append(String.format(PATTERN_2, userApp.getContainerUrl(), userApp.getContainerName()));
 				sb.append(String.format(PATTERN_3, userApp.getContainerName(), userApp.getContainerName()));
 			}
+			
+			//setup reversed proxy route for main ribbitup
+			sb.append(String.format(PATTERN_1, ribbitupContainerName, ribbitupContainerUrl));
+			sb.append(String.format(PATTERN_2, ribbitupContainerUrl, ribbitupContainerName));
+			sb.append(String.format(PATTERN_3, ribbitupContainerName, ribbitupContainerName));
 			
 			String finalConfigStr = String.format(TEMPLATE, sb.toString());
 			

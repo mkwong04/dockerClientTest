@@ -12,3 +12,6 @@ maintenance.container.name: management
 apache.container.name: apache2
 apache.container.conf.path: /etc/apache2/sites-available
 apache.container.default.conf.name: 000-default.conf
+
+ribbitup.container.name: ribbitup
+ribbitup.container.url: http://ribbitup:9001
