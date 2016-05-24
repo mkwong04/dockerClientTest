@@ -13,5 +13,8 @@ apache.container.name: apache2
 apache.container.conf.path: /etc/apache2/sites-available
 apache.container.default.conf.name: 000-default.conf
 
-ribbitup.container.name: ribbitup
+ribbitup.container.ext.name: ribbitup
 ribbitup.container.url: http://ribbitup:9001
+
+management.container.ext.name: maint
+management.container.url: http://management:8080/mainenance

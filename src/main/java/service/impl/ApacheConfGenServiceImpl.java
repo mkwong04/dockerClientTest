@@ -25,11 +25,17 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 	@Value("${apache.conf.name}")
 	private String apacheConfFile;
 	
-	@Value("${ribbitup.container.name}")
-	private String ribbitupContainerName;
+	@Value("${ribbitup.container.ext.name}")
+	private String ribbitupContainerExtName;
 	
 	@Value("${ribbitup.container.url}")
 	private String ribbitupContainerUrl;
+	
+	@Value("${management.container.ext.name}")
+	private String managementContainerExtName;
+	
+	@Value("${management.container.url}")
+	private String managementContainerUrl;
 	
 	public static final String TEMPLATE = "<VirtualHost *:80>\n"+
 			 							  "    ServerAdmin webmaster@localhost\n"+
@@ -70,10 +76,15 @@ public class ApacheConfGenServiceImpl implements ApacheConfGenService{
 				sb.append(String.format(PATTERN_3, userApp.getContainerName(), userApp.getContainerName()));
 			}
 			
-			//setup reversed proxy route for main ribbitup
-			sb.append(String.format(PATTERN_1, ribbitupContainerName, ribbitupContainerUrl));
-			sb.append(String.format(PATTERN_2, ribbitupContainerUrl, ribbitupContainerName));
-			sb.append(String.format(PATTERN_3, ribbitupContainerName, ribbitupContainerName));
+			//setup reversed proxy route for main ribbitup container
+			sb.append(String.format(PATTERN_1, ribbitupContainerExtName, ribbitupContainerUrl));
+			sb.append(String.format(PATTERN_2, ribbitupContainerUrl, ribbitupContainerExtName));
+			sb.append(String.format(PATTERN_3, ribbitupContainerExtName, ribbitupContainerExtName));
+			
+			//setup reversed proxy route for management container
+			sb.append(String.format(PATTERN_1, managementContainerExtName, managementContainerUrl));
+			sb.append(String.format(PATTERN_2, managementContainerUrl, managementContainerExtName));
+			sb.append(String.format(PATTERN_3, managementContainerExtName, managementContainerExtName));
 			
 			String finalConfigStr = String.format(TEMPLATE, sb.toString());
 			
