@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,16 +22,21 @@ import service.MaintenanceService;
 
 @RestController
 @Slf4j
+
 public class MaintenanceRestController {
 	
 	@Autowired
 	private MaintenanceService maintenanceService;
 	
-	@RequestMapping("/")
+	@CrossOrigin(origins={"*"}, 
+			 methods={RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT},
+			 allowedHeaders={"origin", "content-type", "accept", "authorization"})
+	@RequestMapping(path="/",method=RequestMethod.GET)
 	public void test(){
 		log.info("Hello");
 	}
 
+	
 	@RequestMapping(path="/install", method=RequestMethod.POST, consumes={"application/json"},  produces={"application/json"})
 	public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request){
 		log.info("register user");
@@ -68,6 +74,9 @@ public class MaintenanceRestController {
 		}
 	}
 	
+	@CrossOrigin(origins={"*"}, 
+			 methods={RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT},
+			 allowedHeaders={"origin", "content-type", "accept", "authorization"})
 	@RequestMapping(path="/userApps", 
 					method=RequestMethod.GET, 
 					produces={"application/json"})
