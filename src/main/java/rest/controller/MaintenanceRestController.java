@@ -31,11 +31,25 @@ public class MaintenanceRestController {
 		log.info("Hello");
 	}
 
-	@RequestMapping(path="/signup", method=RequestMethod.POST, consumes={"application/json"},  produces={"application/json"})
+	@RequestMapping(path="/install", method=RequestMethod.POST, consumes={"application/json"},  produces={"application/json"})
 	public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request){
 		log.info("register user");
 		
-		try{		
+		try{
+			//1. check if app already exist
+			List<service.model.UserApp> userAppList = maintenanceService.findUserApp(request.getUserName());
+			
+			for(service.model.UserApp userApp: userAppList){
+				if(userApp.getAppName().equals(request.getAppName())){
+					log.error("App [{}] already installed for user [{}]",request.getAppName(), request.getUserName());
+					return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
+																				.status("Error")
+																				.errorMsg("App ["+request.getAppName()+"] already installed for user ["+request.getUserName()+"]")
+																				.build(), 
+																				HttpStatus.BAD_REQUEST);
+				}
+			}
+			
 			String userAppUrl = maintenanceService.createApp(request.getUserName(),request.getAppName());
 		
 			return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
