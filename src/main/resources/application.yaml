@@ -17,4 +17,4 @@ ribbitup.container.ext.name: ribbitup
 ribbitup.container.url: http://ribbitup:9001
 
 management.container.ext.name: maint
-management.container.url: http://management:8080/mainenance
+management.container.url: http://management:8080/maintenance
