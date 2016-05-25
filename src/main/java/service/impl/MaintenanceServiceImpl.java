@@ -1,5 +1,8 @@
 package service.impl;
 
+import static app.Constant.START_CMD_POSTFIX;
+import static app.Constant.START_URL_PATTERN_POSTFIX;
+
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
@@ -70,8 +73,8 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 		//TODO:
 		String appImageName = appImagesProperties.getProperty(appName);
 
-		String startCmd = "/home/usr/ribbitup/start";
-		String containerListenUrlPattern = "http://%s:9001";
+		String startCmd = appImagesProperties.getProperty(appName+START_CMD_POSTFIX);
+		String containerListenUrlPattern = appImagesProperties.getProperty(appName+START_URL_PATTERN_POSTFIX);
 		
 		if(appImageName==null || appImageName.trim() ==""){
 			throw new MaintenanceServiceException("no images found for "+appName);

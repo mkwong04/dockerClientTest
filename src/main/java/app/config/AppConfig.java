@@ -2,6 +2,9 @@ package app.config;
 
 import java.util.Properties;
 
+import static app.Constant.START_CMD_POSTFIX;
+import static app.Constant.START_URL_PATTERN_POSTFIX;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Bean;
@@ -49,7 +52,11 @@ public class AppConfig {
 		Properties appImageProp = new Properties();
 		
 		appImageProp.put("ui","ribbituptest/ribbitupui");
+		appImageProp.put("ui"+START_CMD_POSTFIX,"/home/usr/ribbitup/start");
+		appImageProp.put("ui"+START_URL_PATTERN_POSTFIX,"http://%s:9001");
 		appImageProp.put("paymentLink","ribbituptest/paymentlink");
+		appImageProp.put("paymentLink"+START_CMD_POSTFIX,"/home/usr/paymentlink/paymentlinkTest/start");
+		appImageProp.put("paymentLink"+START_URL_PATTERN_POSTFIX,"http://%s:9000");
 		
 		return appImageProp;
 	}
