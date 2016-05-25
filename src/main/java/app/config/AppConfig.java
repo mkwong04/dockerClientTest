@@ -49,6 +49,7 @@ public class AppConfig {
 		Properties appImageProp = new Properties();
 		
 		appImageProp.put("ui","ribbituptest/ribbitupui");
+		appImageProp.put("paymentLink","ribbituptest/paymentlink");
 		
 		return appImageProp;
 	}
