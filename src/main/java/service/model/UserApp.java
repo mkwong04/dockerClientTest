@@ -15,5 +15,4 @@ public class UserApp{
 	private String containerUrl;
 	private String containerName;
 	
-	private String networkId;
 }

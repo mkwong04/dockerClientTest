@@ -43,17 +43,13 @@ public class MaintenanceRestController {
 		
 		try{
 			//1. check if app already exist
-			List<service.model.UserApp> userAppList = maintenanceService.findUserApp(request.getUserName());
-			
-			for(service.model.UserApp userApp: userAppList){
-				if(userApp.getAppName().equals(request.getAppName())){
+			if(maintenanceService.findUserApp(request.getUserName(), request.getAppName()).isPresent()){
 					log.error("App [{}] already installed for user [{}]",request.getAppName(), request.getUserName());
 					return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
 																				.status("Error")
 																				.errorMsg("App ["+request.getAppName()+"] already installed for user ["+request.getUserName()+"]")
 																				.build(), 
 																				HttpStatus.BAD_REQUEST);
-				}
 			}
 			
 			String userAppUrl = maintenanceService.createApp(request.getUserName(),request.getAppName());
@@ -75,8 +71,8 @@ public class MaintenanceRestController {
 	}
 	
 	@CrossOrigin(origins={"*"}, 
-			 methods={RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT},
-			 allowedHeaders={"origin", "content-type", "accept", "authorization"})
+				 methods={RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT},
+				 allowedHeaders={"origin", "content-type", "accept", "authorization"})
 	@RequestMapping(path="/userApps", 
 					method=RequestMethod.GET, 
 					produces={"application/json"})

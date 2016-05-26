@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.extern.slf4j.Slf4j;
 import service.UserAppService;
 import service.exception.UserAppServiceException;
 import service.model.UserApp;
@@ -121,5 +121,70 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 		
 		return results;
 	}
-	
+
+	@Override
+	public void delete(UserApp userApp) throws UserAppServiceException {
+		
+		File dataFile = new File(fileDir+File.separator+userAppDataFile);
+		
+		try(RandomAccessFile raf = new RandomAccessFile(dataFile,"rwd");){
+			
+			boolean recordFound = false;
+			String record; 
+			long filePointerOffset = 0;
+			long lengthOfRecord;
+					
+			//search line by line read for record
+			while ((record = raf.readLine() )!= null) {
+				String[] data = record.split(",");
+
+				//if record found
+				if(data.length==5 && 
+				   data[1]!=null && data[1].equals(userApp.getUserName()) &&
+				   data[2]!=null && data[2].equals(userApp.getAppName())){
+					recordFound = true;
+					break;
+				}
+				
+				//keep the file pointer position
+				filePointerOffset = raf.getFilePointer();
+			}
+			
+			if(!recordFound){
+				throw new UserAppServiceException("no record found for "+userApp.getUserName()+":"+userApp.getAppName());
+			}
+			
+			//last readline will shift the file pointer offset, so length of record = current file pointer offset - last record read offset
+			lengthOfRecord = raf.getFilePointer() - filePointerOffset;
+			
+			/**** moving the records up block by block ****/
+			
+			//read buffer of block size of 8k byte
+			byte[] buffer = new byte[8192];
+			int byteRead;
+			long lastReadFilePointerOffset;
+			
+			//read into buffer by block size of max 8k
+			while((byteRead = raf.read(buffer))> -1){
+				
+				//note position after read
+				lastReadFilePointerOffset = raf.getFilePointer();
+				
+				//move back to position before the buffer read and minus the length of record
+				raf.seek( lastReadFilePointerOffset - byteRead - lengthOfRecord);
+				
+				//overwrite the data at file position with buffer read content
+				raf.write(buffer, 0, byteRead);
+				
+				//move to last read file pointer position
+				raf.seek(lastReadFilePointerOffset);
+			}
+			
+			//truncate the last data (residual of data block after the record moved up)
+			raf.setLength(raf.length()-lengthOfRecord);
+		}
+		catch(IOException e){
+			throw new UserAppServiceException("Failed deleting user App for "+userApp.getUserName()+":"+userApp.getAppName());
+		}
+	}
 }

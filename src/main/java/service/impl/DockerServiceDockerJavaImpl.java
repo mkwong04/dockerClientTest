@@ -7,22 +7,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
-
-import service.DockerService;
-import service.exception.DockerServiceException;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.CreateNetworkResponse;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
+import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.Network;
+import com.github.dockerjava.api.model.NetworkSettings;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
+
+import lombok.extern.slf4j.Slf4j;
+import service.DockerService;
+import service.exception.DockerServiceException;
 
 @Slf4j
 public class DockerServiceDockerJavaImpl implements DockerService{
@@ -67,6 +73,27 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	}
 	
 	@Override
+	public void removeApp(String containerId)
+		throws DockerServiceException{
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			
+			log.info("stopping container : {}",containerId);
+			
+			dockerClient.stopContainerCmd(containerId)
+						//if 60sec grace period exceed for gracefully stop container, kill the container
+						.withTimeout(60)
+						.exec();
+			
+			log.info("removing container : {}", containerId);
+			dockerClient.removeContainerCmd(containerId)
+						.exec();
+			
+		}
+		catch(IOException e){
+			throw new DockerServiceException("failed removing container "+containerId,e);
+		}
+	}
+	@Override
 	public String createConnection(String networkName, 
 								   String driver)
 		throws DockerServiceException{
@@ -88,14 +115,132 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	}
 	
 	@Override
+	public void removeConnection(String networkId)
+			throws DockerServiceException{
+		
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			dockerClient.removeNetworkCmd(networkId)
+						.exec();
+		} 
+		catch (IOException e) {
+			throw new DockerServiceException("remove connection failed",e);
+		}
+	}
+	
+	@Override
+	public Optional<String> getContainerId(String containerName) throws DockerServiceException{
+		Optional<Container> container = getContainer(containerName);
+		
+		if(container.isPresent()){
+			return Optional.ofNullable(container.get().getId());
+		}
+		else{
+			return Optional.empty();
+		}
+	}
+	
+	@Override
+	public Optional<Container> getContainer(String containerName) throws DockerServiceException{
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			
+			List<Container> containers = dockerClient.listContainersCmd().exec();
+			
+			return containers.stream()
+					  		 .filter(obj -> obj.getNames()!=null && 
+					  					    obj.getNames().length>0 && 
+					  						containerName.equals(obj.getNames()[0]))
+					  		 .findFirst();
+		}
+		catch (IOException e) {
+			throw new DockerServiceException("get container by name failed",e);
+		}
+	}
+	
+	@Override
+	public Optional<NetworkSettings.Network> getContainerNetwork(String containerId, String networkName) 
+			throws DockerServiceException{
+		Map<String, NetworkSettings.Network> resultMap = getContainerNetworks(containerId);
+		
+		NetworkSettings.Network network = resultMap.get(networkName);
+		
+		if(network==null){
+			return Optional.empty();
+		}
+		else{
+			return Optional.of(network);
+		}
+	}
+	
+	public Map<String, NetworkSettings.Network> getContainerNetworks(String containerId) throws DockerServiceException{
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			InspectContainerResponse result = dockerClient.inspectContainerCmd(containerId)
+														  .exec();
+			
+			return result.getNetworkSettings().getNetworks();
+		}
+		catch (IOException e) {
+			throw new DockerServiceException("inspect container by name failed",e);
+		}
+	}
+	
+	@Override
+	public Optional<String> getConnectionId(String newtworkName, 
+											String containerId) 
+		throws DockerServiceException{
+		
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+			
+				List<Network> networks = dockerClient.listNetworksCmd()
+													 .withNameFilter(newtworkName)
+													 .exec();
+				
+				if(!networks.isEmpty()){
+					//since network name is not guarantee unique, use containerId to ensure picking up the right network
+					
+					Optional<Network> networkOpt = networks.stream()
+														   .filter(obj-> obj.getContainers()!=null && 
+															   		     obj.getContainers().get(containerId) !=null)
+														   .findFirst();
+					
+					if(networkOpt.isPresent()){
+						return Optional.ofNullable(networkOpt.get().getId());
+					}
+					else{
+						return Optional.empty();
+					}
+				}
+				else{
+					return Optional.empty();
+				}
+		}
+		catch (IOException e) {
+			throw new DockerServiceException("get connection by name failed",e);
+		}
+	}
+	
+	@Override
+	public void disconnectConnection(String networkId, String containerId) throws DockerServiceException{
+		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
+
+			dockerClient.disconnectFromNetworkCmd()
+						.withContainerId(containerId)
+						.withNetworkId(networkId)
+						.exec();
+		}
+		catch (IOException e) {
+			throw new DockerServiceException("disconnection connection failed",e);
+		}
+	}
+	
+	@Override
 	public void connectConnection(String networkId, 
-								  String containerName)
+								  String containerNameOrId)
 		throws DockerServiceException{
 		
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
 			dockerClient.connectToNetworkCmd()
 						.withNetworkId(networkId)
-						.withContainerId(containerName)
+						.withContainerId(containerNameOrId)
 						.exec();
 		}
 		catch (IOException e) {

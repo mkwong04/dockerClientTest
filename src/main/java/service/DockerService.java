@@ -1,5 +1,10 @@
 package service;
 
+import java.util.Optional;
+
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.NetworkSettings;
+
 import service.exception.DockerServiceException;
 
 public interface DockerService{
@@ -18,6 +23,13 @@ public interface DockerService{
 	
 	/**
 	 * 
+	 * @param containerId
+	 * @throws DockerServiceException
+	 */
+	void removeApp(String containerId)
+			throws DockerServiceException;
+	/**
+	 * 
 	 * @param networkName
 	 * @param driver
 	 * @return
@@ -30,14 +42,38 @@ public interface DockerService{
 	/**
 	 * 
 	 * @param networkId
-	 * @param containerName
+	 * @throws DockerServiceException
+	 */
+	void removeConnection(String networkId)
+			throws DockerServiceException;
+	/**
+	 * 
+	 * @param networkId
+	 * @param containerNameOrId
 	 * @return
 	 * @throws DockerServiceException
 	 */
 	void connectConnection(String networkId, 
-		                   String containerName)
+		                   String containerNameOrId)
 		throws DockerServiceException;
 	
+	/**
+	 * 
+	 * @param networkId
+	 * @param containerId
+	 * @throws DockerServiceException
+	 */
+	void disconnectConnection(String networkId, String containerId) 
+		throws DockerServiceException;
+	
+	/**
+	 * 
+	 * @param newtworkName
+	 * @param containerId
+	 * @return
+	 * @throws DockerServiceException
+	 */
+	Optional<String> getConnectionId(String newtworkName, String containerId) throws DockerServiceException;
 	/**
 	 * 
 	 * @param sourceContainerName
@@ -57,4 +93,30 @@ public interface DockerService{
 	 * @throws DockerServiceException
 	 */
 	void execCmd(String containerName, String... cmd) throws DockerServiceException;
+	
+	/**
+	 * 
+	 * @param containerName
+	 * @return
+	 * @throws DockerServiceException
+	 */
+	Optional<Container> getContainer(String containerName) throws DockerServiceException;
+	
+	/**
+	 * 
+	 * @param containerName
+	 * @return
+	 * @throws DockerServiceException
+	 */
+	Optional<String> getContainerId(String containerName) throws DockerServiceException;
+	
+	/**
+	 * 
+	 * @param containerId
+	 * @param networkName
+	 * @return
+	 * @throws DockerServiceException
+	 */
+	Optional<NetworkSettings.Network> getContainerNetwork(String containerId, String networkName) 
+			throws DockerServiceException;
 }

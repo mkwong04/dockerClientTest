@@ -1,6 +1,7 @@
 package service;
 
 import java.util.List;
+import java.util.Optional;
 
 import service.exception.MaintenanceServiceException;
 import service.model.UserApp;
@@ -15,6 +16,15 @@ public interface MaintenanceService {
 	 * @throws MaintenanceServiceException
 	 */
 	String createApp(String userName, String appImageName) throws MaintenanceServiceException;
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param appImageName
+	 * @return
+	 * @throws MaintenanceServiceException
+	 */
+	String removeApp(String userName, String appImageName) throws MaintenanceServiceException;
 
 	/**
 	 * 
@@ -29,4 +39,13 @@ public interface MaintenanceService {
 	 * @throws MaintenanceServiceException
 	 */
 	List<UserApp> findUserApp(String userName) throws MaintenanceServiceException;
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param appName
+	 * @return
+	 * @throws MaintenanceServiceException
+	 */
+	Optional<UserApp> findUserApp(String userName, String appName) throws MaintenanceServiceException;
 }
