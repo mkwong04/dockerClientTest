@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -142,23 +144,17 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 	@Override
 	public Optional<Container> getContainer(String containerName) throws DockerServiceException{
 		try(DockerClient dockerClient = DockerClientBuilder.getInstance(createConfig()).build();){
-			
+			String refContainerName = "/"+containerName;
 			List<Container> containers = dockerClient.listContainersCmd().exec();
 			
-			for(Container container: containers){
-				log.info("container name: {} ",container.getNames()!=null && container.getNames().length>0?container.getNames()[0]:"" );
-				
-				if(container.getNames()!=null && container.getNames().length>0 && containerName.equals(container.getNames()[0])){
-					return Optional.of(container);
-				}
-			}
-			
-			return Optional.empty();
-//			return containers.stream()
-//					  		 .filter(obj -> obj.getNames()!=null && 
-//					  					    obj.getNames().length>0 && 
-//					  						containerName.equals(obj.getNames()[0]))
-//					  		 .findFirst();
+			return containers.stream()
+					  		 .filter(obj -> {
+					  			 			log.info("container name : {}",Arrays.asList(obj.getNames()));
+					  			 			
+					  			 			return obj.getNames()!=null && 
+					  			 				   obj.getNames().length>0 && 
+					  			 				   refContainerName.equals(obj.getNames()[0]);})
+					  		 .findFirst();
 		}
 		catch (IOException e) {
 			throw new DockerServiceException("get container by name failed",e);
