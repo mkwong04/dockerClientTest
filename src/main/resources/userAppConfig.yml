@@ -1,0 +1,21 @@
+app:
+   # payment link apps
+   paymentLink:
+       imageName: ribbituptest/paymentlink
+       startCmd: /home/usr/paymentlink/paymentlinkTest/start
+       startUrl: http://%s:9000
+   # invoice pay apps
+   invoicePay:
+      imageName: ribbituptest/invoicepay
+      startcmd: /home/usr/invoicepay/invoicepayTest/start
+      startUrl: http://%s:9000
+   # request pay apps
+   requestPay:
+      imageName: ribbituptest/requestpay
+      startcmd: /home/usr/requestpay/requestpayTest/start
+      startUrl: http://%s:9000
+   # reoccur pay apps
+   reoccurePay:
+      imageName: ribbituptest/reoccurepay
+      startcmd: /home/usr/reoccurepay/reoccurepayTest/start
+      startUrl: http://%s:9000

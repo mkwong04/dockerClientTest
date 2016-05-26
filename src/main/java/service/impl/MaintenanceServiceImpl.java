@@ -1,25 +1,18 @@
 package service.impl;
 
-import static app.Constant.START_CMD_POSTFIX;
-import static app.Constant.START_URL_PATTERN_POSTFIX;
-
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.NetworkSettings;
 
+import lombok.extern.slf4j.Slf4j;
 import service.ApacheConfGenService;
+import service.AppConfigService;
 import service.DockerService;
 import service.MaintenanceService;
 import service.UserAppService;
@@ -34,10 +27,6 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 	
 	static final String BASH_CMD = "/bin/bash";
 	static final String BASH_STRING_OPT = "-c";
-	
-	@Resource
-	@Qualifier("appImagesProperties")
-	private Properties appImagesProperties;
 	
 	@Value("${domain.url}")
 	private String domainUrl;
@@ -68,22 +57,22 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 	
 	@Autowired
 	private ApacheConfGenService apacheConfGenService;
+	
+	@Autowired
+	private AppConfigService appConfigService;
 
 	@Override
 	public String createApp(String userName, String appName) throws MaintenanceServiceException{
 		
 		String containerName = userName+"_"+appName;
 		
-		//TODO:
-		String appImageName = appImagesProperties.getProperty(appName);
-
-		String startCmd = appImagesProperties.getProperty(appName+START_CMD_POSTFIX);
-		String containerListenUrlPattern = appImagesProperties.getProperty(appName+START_URL_PATTERN_POSTFIX);
+		String appImageName = appConfigService.getImageName(appName);
+		String startCmd = appConfigService.getStartCommand(appName);
+		String containerListenUrlPattern = appConfigService.getStartUrlPattern(appName);
 		
 		if(appImageName==null || appImageName.trim() ==""){
-			throw new MaintenanceServiceException("no images found for "+appName);
+			throw new MaintenanceServiceException("no images defined for "+appName);
 		}
-		
 		
 		try
 		{
