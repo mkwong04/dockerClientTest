@@ -83,7 +83,7 @@ public class MaintenanceRestController {
 	 */
 	@RequestMapping(path="/uninstall", method=RequestMethod.POST, consumes={"application/json"},  produces={"application/json"})
 	public ResponseEntity<UninstallUserAppResponse> uninstallUserApp(@RequestBody UninstallUserAppRequest request){
-		log.info("register user");
+		log.info("uninstall user app [{}] for {}",request.getAppName(), request.getUserName());
 		
 		try{
 			//1. check if app exist

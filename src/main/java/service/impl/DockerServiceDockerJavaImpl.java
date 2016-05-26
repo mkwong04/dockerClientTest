@@ -145,11 +145,20 @@ public class DockerServiceDockerJavaImpl implements DockerService{
 			
 			List<Container> containers = dockerClient.listContainersCmd().exec();
 			
-			return containers.stream()
-					  		 .filter(obj -> obj.getNames()!=null && 
-					  					    obj.getNames().length>0 && 
-					  						containerName.equals(obj.getNames()[0]))
-					  		 .findFirst();
+			for(Container container: containers){
+				log.info("container name: {} ",container.getNames()!=null && container.getNames().length>0?container.getNames()[0]:"" );
+				
+				if(container.getNames()!=null && container.getNames().length>0 && containerName.equals(container.getNames()[0])){
+					return Optional.of(container);
+				}
+			}
+			
+			return Optional.empty();
+//			return containers.stream()
+//					  		 .filter(obj -> obj.getNames()!=null && 
+//					  					    obj.getNames().length>0 && 
+//					  						containerName.equals(obj.getNames()[0]))
+//					  		 .findFirst();
 		}
 		catch (IOException e) {
 			throw new DockerServiceException("get container by name failed",e);
