@@ -7,10 +7,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RegisterResponse {
+public class InstallUserAppResponse {
 	
 	@JsonProperty
-	private String status;
+	private String status; 
 	
 	@JsonProperty
 	private String errorMsg;

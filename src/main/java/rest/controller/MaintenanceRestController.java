@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
-import rest.model.RegisterRequest;
-import rest.model.RegisterResponse;
+import rest.model.InstallUserAppRequest;
+import rest.model.InstallUserAppResponse;
+import rest.model.UninstallUserAppRequest;
+import rest.model.UninstallUserAppResponse;
 import rest.model.UserApp;
 import rest.model.UserAppListResponse;
 import service.MaintenanceService;
@@ -36,16 +38,20 @@ public class MaintenanceRestController {
 		log.info("Hello");
 	}
 
-	
+	/**
+	 * installing user app
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(path="/install", method=RequestMethod.POST, consumes={"application/json"},  produces={"application/json"})
-	public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request){
-		log.info("register user");
+	public ResponseEntity<InstallUserAppResponse> installUserApp(@RequestBody InstallUserAppRequest request){
+		log.info("installing user app [{}] for {}",request.getAppName(), request.getUserName());
 		
 		try{
 			//1. check if app already exist
 			if(maintenanceService.findUserApp(request.getUserName(), request.getAppName()).isPresent()){
 					log.error("App [{}] already installed for user [{}]",request.getAppName(), request.getUserName());
-					return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
+					return new ResponseEntity<InstallUserAppResponse>(InstallUserAppResponse.builder()
 																				.status("Error")
 																				.errorMsg("App ["+request.getAppName()+"] already installed for user ["+request.getUserName()+"]")
 																				.build(), 
@@ -54,7 +60,7 @@ public class MaintenanceRestController {
 			
 			String userAppUrl = maintenanceService.createApp(request.getUserName(),request.getAppName());
 		
-			return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
+			return new ResponseEntity<InstallUserAppResponse>(InstallUserAppResponse.builder()
 																		.status("Success")
 																		.url(userAppUrl)
 																		.build(), 
@@ -62,7 +68,7 @@ public class MaintenanceRestController {
 		}
 		catch(Exception e){
 			log.error("Failed createApp",e);
-			return new ResponseEntity<RegisterResponse>(RegisterResponse.builder()
+			return new ResponseEntity<InstallUserAppResponse>(InstallUserAppResponse.builder()
 																		.status("Error")
 																		.errorMsg(e.getMessage())
 																		.build(), 
@@ -70,6 +76,49 @@ public class MaintenanceRestController {
 		}
 	}
 	
+	/**
+	 * uninstalling user app
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(path="/uninstall", method=RequestMethod.POST, consumes={"application/json"},  produces={"application/json"})
+	public ResponseEntity<UninstallUserAppResponse> uninstallUserApp(@RequestBody UninstallUserAppRequest request){
+		log.info("register user");
+		
+		try{
+			//1. check if app exist
+			if(!maintenanceService.findUserApp(request.getUserName(), request.getAppName()).isPresent()){
+					log.error("App [{}] not install for user [{}]",request.getAppName(), request.getUserName());
+					return new ResponseEntity<UninstallUserAppResponse>(UninstallUserAppResponse.builder()
+																				.status("Error")
+																				.errorMsg("App ["+request.getAppName()+"] not install for user ["+request.getUserName()+"]")
+																				.build(), 
+																		HttpStatus.BAD_REQUEST);
+			}
+			
+			String userAppUrl = maintenanceService.removeApp(request.getUserName(),request.getAppName());
+		
+			log.info("Successully invalidated {} ", userAppUrl);
+			
+			return new ResponseEntity<UninstallUserAppResponse>(UninstallUserAppResponse.builder()
+																						.status("Success")
+																						.build(), 
+																HttpStatus.OK);
+		}
+		catch(Exception e){
+			log.error("Failed createApp",e);
+			return new ResponseEntity<UninstallUserAppResponse>(UninstallUserAppResponse.builder()
+																		.status("Error")
+																		.errorMsg(e.getMessage())
+																		.build(), 
+																		HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	/**
+	 * list all user apps
+	 * @return
+	 */
 	@CrossOrigin(origins={"*"}, 
 				 methods={RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT},
 				 allowedHeaders={"origin", "content-type", "accept", "authorization"})
@@ -105,6 +154,11 @@ public class MaintenanceRestController {
 		}
 	}
 	
+	/**
+	 * find all apps for given user
+	 * @param userName
+	 * @return
+	 */
 	@RequestMapping(path="/userApps/user/{userName}", 
 				    method=RequestMethod.GET, 
 				    produces={"application/json"})

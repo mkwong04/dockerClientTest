@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class UninstallUserAppRequest {
 	
 	@JsonProperty
 	private String userName;
