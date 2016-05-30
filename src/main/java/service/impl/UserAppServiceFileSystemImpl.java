@@ -19,6 +19,20 @@ import service.model.UserApp;
 @Slf4j
 public class UserAppServiceFileSystemImpl implements UserAppService{
 	
+	private static final String DELIMINATOR = "\u0009";
+	private static final String USER_APP_PATTERN = 	"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"%s"+DELIMINATOR+
+													"\n";
+	
+	private int FIELD_PER_ROW = 9;
+	
 	@Value("${file.dir}")
 	private String fileDir;
 	
@@ -41,7 +55,7 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 		File dataFile = new File(fileDir+File.separator+userAppDataFile);
 		
 		try(FileWriter fw = new FileWriter(dataFile, true);){
-			fw.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s\n", 
+			fw.write(String.format(USER_APP_PATTERN, 
 								   userApp.getId(),
 								   userApp.getUserName(),
 								   userApp.getAppName(),
@@ -72,9 +86,9 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 			
 			String record;
 			while((record = br.readLine())!=null){
-				String[] data = record.split(",");
+				String[] data = record.split(DELIMINATOR);
 
-				if(data.length==9){
+				if(data.length==FIELD_PER_ROW){
 					results.add(buildUserApp(data));
 				}
 			}
@@ -98,9 +112,9 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 			
 			String record;
 			while((record = br.readLine())!=null){
-				String[] data = record.split(",");
+				String[] data = record.split(DELIMINATOR);
 
-				if(data.length==5 && 
+				if(data.length==FIELD_PER_ROW && 
 				   data[1]!=null && data[1].equals(userName)){
 					results.add(buildUserApp(data));
 				}
@@ -142,10 +156,10 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 					
 			//search line by line read for record
 			while ((record = raf.readLine() )!= null) {
-				String[] data = record.split(",");
+				String[] data = record.split(DELIMINATOR);
 
 				//if record found
-				if(data.length==5 && 
+				if(data.length==FIELD_PER_ROW && 
 				   data[1]!=null && data[1].equals(userApp.getUserName()) &&
 				   data[2]!=null && data[2].equals(userApp.getAppName())){
 					recordFound = true;
