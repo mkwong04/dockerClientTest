@@ -86,6 +86,14 @@ public class MaintenanceRestController {
 		log.info("uninstall user app [{}] for {}",request.getAppName(), request.getUserName());
 		
 		try{
+			if(request.getAppName()==null || request.getUserName()==null){
+				log.error("App [{}] or user [{}] can not be null",request.getAppName(), request.getUserName());
+				return new ResponseEntity<UninstallUserAppResponse>(UninstallUserAppResponse.builder()
+																			.status("Error")
+																			.errorMsg("App ["+request.getAppName()+"] or user ["+request.getUserName()+"] is not valid")
+																			.build(), 
+																	HttpStatus.BAD_REQUEST);
+			}
 			//1. check if app exist
 			if(!maintenanceService.findUserApp(request.getUserName(), request.getAppName()).isPresent()){
 					log.error("App [{}] not install for user [{}]",request.getAppName(), request.getUserName());
