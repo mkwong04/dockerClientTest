@@ -41,12 +41,16 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 		File dataFile = new File(fileDir+File.separator+userAppDataFile);
 		
 		try(FileWriter fw = new FileWriter(dataFile, true);){
-			fw.write(String.format("%s,%s,%s,%s,%s\n", 
+			fw.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s\n", 
 								   userApp.getId(),
 								   userApp.getUserName(),
 								   userApp.getAppName(),
 								   userApp.getContainerName(),
-								   userApp.getContainerUrl()));
+								   userApp.getContainerUrl(),
+								   userApp.getDisplayName(),
+								   userApp.getSlogan(),
+								   userApp.getDescription(),
+								   userApp.getFeatures()));
 			
 			fw.flush();
 		}
@@ -70,14 +74,8 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 			while((record = br.readLine())!=null){
 				String[] data = record.split(",");
 
-				if(data.length==5){
-					results.add(UserApp.builder()
-									   .id(data[0])
-									   .userName(data[1])
-									   .appName(data[2])
-									   .containerName(data[3])
-									   .containerUrl(data[4])
-									   .build());
+				if(data.length==9){
+					results.add(buildUserApp(data));
 				}
 			}
 			
@@ -104,13 +102,7 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 
 				if(data.length==5 && 
 				   data[1]!=null && data[1].equals(userName)){
-					results.add(UserApp.builder()
-									   .id(data[0])
-									   .userName(data[1])
-									   .appName(data[2])
-									   .containerName(data[3])
-									   .containerUrl(data[4])
-									   .build());
+					results.add(buildUserApp(data));
 				}
 			}
 			
@@ -120,6 +112,20 @@ public class UserAppServiceFileSystemImpl implements UserAppService{
 		}
 		
 		return results;
+	}
+	
+	private UserApp buildUserApp(String[] data){
+		return UserApp.builder()
+					  .id(data[0])
+					  .userName(data[1])
+					  .appName(data[2])
+					  .containerName(data[3])
+					  .containerUrl(data[4])
+					  .displayName(data[5])
+					  .slogan(data[6])
+					  .description(data[7])
+					  .features(data[8])
+					  .build();
 	}
 
 	@Override

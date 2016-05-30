@@ -17,4 +17,16 @@ public class UserApp{
 	
 	@JsonProperty
 	private String appName;
+	
+	@JsonProperty
+	private String displayName;
+	
+	@JsonProperty
+	private String slogn;
+	
+	@JsonProperty
+	private String description;
+	
+	@JsonProperty
+	private String features;
 }

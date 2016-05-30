@@ -4,18 +4,34 @@ app:
        imageName: ribbituptest/paymentlink
        startCmd: /home/usr/paymentlink/paymentlinkTest/start
        startUrl: http://%s:9000
+       displayName: RibbitUp Me
+       slogan: Create Payment Link
+       description: The app will assist the user in creating and managing product links as well as handling the transactions associated with those products.
+       features: My Links=paymentlinks,Create New Link=creatpaymentlink,View Transactions=transactions
    # invoice pay apps
    invoicePay:
       imageName: ribbituptest/invoicepay
       startcmd: /home/usr/invoicepay/invoicepayTest/start
       startUrl: http://%s:9000
+      displayName: RibbitUp Invoice Pay
+      slogan: Invoice Pay
+      description: 
+      features: 
    # request pay apps
    requestPay:
       imageName: ribbituptest/requestpay
       startcmd: /home/usr/requestpay/requestpayTest/start
       startUrl: http://%s:9000
+      displayName: RibbitUp Ez Transfer
+      slogan: Request Payment
+      description: 
+      features: 
    # reoccur pay apps
    reoccurePay:
       imageName: ribbituptest/reoccurepay
       startcmd: /home/usr/reoccurepay/reoccurepayTest/start
       startUrl: http://%s:9000
+      displayName: RibbitUp Reoccure Pay
+      slogan: Payment Plans
+      description: 
+      features: 

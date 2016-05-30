@@ -96,6 +96,10 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 					 				 .appName(appName)
 					 				 .containerName(containerName)
 					 				 .containerUrl(routeUrl)
+					 				 .displayName(appConfigService.getDisplayName(appName))
+					 				 .slogan(appConfigService.getSlogan(appName))
+					 				 .description(appConfigService.getDescription(appName))
+					 				 .features(appConfigService.getFeatures(appName))
 					 				 .build();
 
 			log.info("Saving record to persistence layer");

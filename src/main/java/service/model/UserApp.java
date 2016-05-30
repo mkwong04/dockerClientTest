@@ -15,4 +15,9 @@ public class UserApp{
 	private String containerUrl;
 	private String containerName;
 	
+	//for ui usage
+	private String displayName;
+	private String slogan;
+	private String description;
+	private String features;
 }

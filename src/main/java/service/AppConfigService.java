@@ -22,4 +22,29 @@ public interface AppConfigService{
 	 * @return
 	 */
 	String getStartUrlPattern(String appName);
+	
+	/**
+	 * 
+	 * @param appName
+	 * @return
+	 */
+	String getDisplayName(String appName);
+	/**
+	 * 
+	 * @param appName
+	 * @return
+	 */
+	String getSlogan(String appName);
+	/**
+	 * 
+	 * @param appName
+	 * @return
+	 */
+	String getDescription(String appName);
+	/**
+	 * 
+	 * @param appName
+	 * @return
+	 */
+	String getFeatures(String appName);
 }

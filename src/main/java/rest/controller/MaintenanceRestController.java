@@ -175,6 +175,10 @@ public class MaintenanceRestController {
 										   .id(userApp.getId())
 										   .appName(userApp.getAppName())
 										   .userName(userApp.getUserName())
+										   .displayName(userApp.getDisplayName())
+										   .slogn(userApp.getSlogan())
+										   .description(userApp.getDescription())
+										   .features(userApp.getFeatures())
 										   .build());
 			}
 

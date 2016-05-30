@@ -15,6 +15,10 @@ public class AppConfigServiceYmlFileImpl implements AppConfigService{
 	private static final String IMAGE_NAME_POST_FIX = ".imageName";
 	private static final String START_CMD_POST_FIX = ".startCmd";
 	private static final String START_URL_PATTERN_POST_FIX = ".startUrl";
+	private static final String DISPLAY_NAME_POST_FIX = ".displayName";
+	private static final String SLOGAN_POST_FIX = ".slogan";
+	private static final String DESCRIPTION_POST_FIX = ".description";
+	private static final String FEATURES_POST_FIX = ".features";
 	
 	/**
 	 * read and populate properties upon instantiated
@@ -41,4 +45,23 @@ public class AppConfigServiceYmlFileImpl implements AppConfigService{
 		return userAppConfigProperies.getProperty(PREFIX+appName+START_URL_PATTERN_POST_FIX);
 	}
 	
+	@Override
+	public String getDisplayName(String appName) {
+		return userAppConfigProperies.getProperty(PREFIX+appName+DISPLAY_NAME_POST_FIX);
+	}
+	
+	@Override
+	public String getSlogan(String appName) {
+		return userAppConfigProperies.getProperty(PREFIX+appName+SLOGAN_POST_FIX);
+	}
+	
+	@Override
+	public String getDescription(String appName) {
+		return userAppConfigProperies.getProperty(PREFIX+appName+DESCRIPTION_POST_FIX);
+	}
+	
+	@Override
+	public String getFeatures(String appName) {
+		return userAppConfigProperies.getProperty(PREFIX+appName+FEATURES_POST_FIX);
+	}
 }
