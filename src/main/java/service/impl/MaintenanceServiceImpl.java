@@ -220,8 +220,8 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			
 			Container container = containerOpt.get();
 			
-			//3. attempt to remove container's network bridge based on container id and network name (same as containerName)
-			Optional<NetworkSettings.Network> networkOpt = dockerService.getContainerNetwork(container.getId(), containerName);
+			//3. attempt to remove container's network bridge based on container id and network name (same as NETWORK_PREFIX+containerName)
+			Optional<NetworkSettings.Network> networkOpt = dockerService.getContainerNetwork(container.getId(), NETWORK_PREFIX+containerName);
 			
 			if(networkOpt.isPresent()){
 				//use containerName as networkName
