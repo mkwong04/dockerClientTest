@@ -25,6 +25,7 @@ import service.model.UserApp;
 @Slf4j
 public class MaintenanceServiceImpl implements MaintenanceService{
 	
+	static final String NETWORK_PREFIX = "nb";
 	static final String BASH_CMD = "/bin/bash";
 	static final String BASH_STRING_OPT = "-c";
 	
@@ -86,7 +87,8 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			
 			log.info("redirect target url :{}",routeUrl);
 			//2. create user defined network bridge
-			String networkId = createContainerNetwork(containerName, appContainerId);
+			//NOTE: added network prefix "nb" as some network bridge name cause apache2 to not responding
+			String networkId = createContainerNetwork(NETWORK_PREFIX+containerName, appContainerId);
 			log.info("network bridge created :{}",networkId);
 
 			//3. create entry in persistence layer
@@ -223,7 +225,7 @@ public class MaintenanceServiceImpl implements MaintenanceService{
 			
 			if(networkOpt.isPresent()){
 				//use containerName as networkName
-				removeContainerNetwork(containerName, container, networkOpt.get());
+				removeContainerNetwork(NETWORK_PREFIX+containerName, container, networkOpt.get());
 			}
 			else{
 				log.info("no network info found, skip network removal");
